@@ -6,6 +6,7 @@ import datetime  # імпорт бібліотеки для роботи з ча
 
 import http.server
 import socketserver
+import threading
 PORT = 443  # Замініть на потрібний вам порт
 class MyHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -116,11 +117,16 @@ def get(message):
 def answer(message):
     bot.send_message(message.chat.id, 'Actually, it is not the name of the city🤓')  # вивід повідомлення про помилку
 
-# Створення серверу, який буде слухати вказаний порт
-with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
-    print(f"Serving at port {PORT}")
-    httpd.serve_forever()
+def run_server():
+    # Створення серверу, який буде слухати вказаний порт
+    with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+        print(f"Serving at port {PORT}")
+        httpd.serve_forever()
+
+server_thread = threading.Thread(target=run_server)
+server_thread.start()
 
 # функція запуску боту, яка відтворює його весь час
 bot.polling(none_stop=True)
 
+server_thread.join()
