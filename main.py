@@ -4,6 +4,17 @@ from config import bot_token  # імпорт токена телеграм бо�
 import requests  # імпорт бібліотеки запросів
 import datetime  # імпорт бібліотеки для роботи з часом
 
+import http.server
+import socketserver
+PORT = 443  # Замініть на потрібний вам порт
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Обробка GET-запитів
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b'Hello, World!')  # Відправка відповіді
+
 # ініціалізація функції
 def weather_report(city_name, weather_token):
     # ініціалізація словника з порадами
@@ -105,5 +116,11 @@ def get(message):
 def answer(message):
     bot.send_message(message.chat.id, 'Actually, it is not the name of the city🤓')  # вивід повідомлення про помилку
 
+# Створення серверу, який буде слухати вказаний порт
+with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+    print(f"Serving at port {PORT}")
+    httpd.serve_forever()
+
 # функція запуску боту, яка відтворює його весь час
 bot.polling(none_stop=True)
+
